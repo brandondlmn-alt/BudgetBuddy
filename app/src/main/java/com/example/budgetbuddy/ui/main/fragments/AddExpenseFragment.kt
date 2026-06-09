@@ -1,20 +1,27 @@
 package com.example.budgetbuddy.ui.main.fragments
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.budgetbuddy.R
 import com.example.budgetbuddy.data.entity.Category
 import com.example.budgetbuddy.data.entity.Expense
+import com.example.budgetbuddy.databinding.FragmentAddExpenseBinding
 import com.example.budgetbuddy.ui.main.viewmodels.AddExpenseViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -22,20 +29,36 @@ import java.util.*
 
 class AddExpenseFragment : Fragment() {
 
+    private var _binding: FragmentAddExpenseBinding? = null
+    private val binding get() = _binding!!
+    
     private var userId: Int = -1
     private var selectedDate: String = ""
     private var selectedStartTime: String = ""
     private var selectedEndTime: String = ""
-    private var photoUri: Uri? = null
+    private var currentPhotoPath: String? = null
     private lateinit var viewModel: AddExpenseViewModel
     private var categoriesList: List<Category> = emptyList()
 
+    private val TAG = "AddExpenseFragment"
+
+    // 1. Contract for Camera Permission
+    private val requestCameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            prepareAndLaunchCamera()
+        } else {
+            Toast.makeText(requireContext(), "Camera permission is required to capture receipts", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // 2. Contract for taking the picture
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            view?.findViewById<ImageView>(R.id.iv_receipt_thumbnail)?.apply {
-                setImageURI(photoUri)
-                visibility = View.VISIBLE
-            }
+            Log.d(TAG, "Picture successfully saved to: $currentPhotoPath")
+            displayThumbnail()
+        } else {
+            Log.w(TAG, "Camera activity returned failure or was cancelled")
+            // Don't null out path immediately in case of fragment recreation issues
         }
     }
 
@@ -48,88 +71,145 @@ class AddExpenseFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_add_expense, container, false)
+    ): View {
+        _binding = FragmentAddExpenseBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         userId = arguments?.getInt("USER_ID") ?: -1
         viewModel = ViewModelProvider(this)[AddExpenseViewModel::class.java]
 
-        val tvDate = view.findViewById<TextView>(R.id.tv_date)
-        val tvStartTime = view.findViewById<TextView>(R.id.tv_start_time)
-        val tvEndTime = view.findViewById<TextView>(R.id.tv_end_time)
-        val spinnerCategory = view.findViewById<Spinner>(R.id.spinner_category)
-        val etAmount = view.findViewById<EditText>(R.id.et_amount)
-        val etDescription = view.findViewById<EditText>(R.id.et_description)
-        val btnAttach = view.findViewById<Button>(R.id.btn_attach_receipt)
-        val btnSave = view.findViewById<Button>(R.id.btn_save)
+        // Restore state if fragment was recreated
+        savedInstanceState?.let {
+            currentPhotoPath = it.getString("photo_path")
+            selectedDate = it.getString("date", "")
+            selectedStartTime = it.getString("start_time", "")
+            selectedEndTime = it.getString("end_time", "")
+            
+            if (selectedDate.isNotEmpty()) binding.tvDate.text = "Date: $selectedDate"
+            displayThumbnail()
+        }
 
-        // Observe Categories
+        setupListeners()
+        loadCategories()
+    }
+
+    private fun setupListeners() {
+        binding.tvDate.setOnClickListener {
+            val cal = Calendar.getInstance()
+            DatePickerDialog(requireContext(), { _, y, m, d ->
+                selectedDate = String.format("%04d-%02d-%02d", y, m + 1, d)
+                binding.tvDate.text = "Date: $selectedDate"
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        binding.btnAttachReceipt.setOnClickListener {
+            checkCameraPermissionAndLaunch()
+        }
+
+        binding.btnSave.setOnClickListener {
+            saveTransaction()
+        }
+    }
+
+    private fun checkCameraPermissionAndLaunch() {
+        val permission = Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            prepareAndLaunchCamera()
+        } else {
+            requestCameraPermission.launch(permission)
+        }
+    }
+
+    private fun prepareAndLaunchCamera() {
+        try {
+            // Using cacheDir is usually more reliable for FileProvider sharing with external apps
+            val photoFile = File.createTempFile("receipt_", ".jpg", requireContext().cacheDir)
+            currentPhotoPath = photoFile.absolutePath
+            
+            val authority = "${requireContext().packageName}.fileprovider"
+            val photoUri = FileProvider.getUriForFile(requireContext(), authority, photoFile)
+            
+            takePicture.launch(photoUri)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to launch camera: ${e.message}")
+            Toast.makeText(requireContext(), "Camera error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun displayThumbnail() {
+        if (_binding == null) return
+        currentPhotoPath?.let { path ->
+            val file = File(path)
+            if (file.exists()) {
+                try {
+                    // Downsample to avoid memory issues (crashing on high-res photos)
+                    val options = BitmapFactory.Options().apply {
+                        inSampleSize = 4
+                    }
+                    val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+                    binding.ivReceiptThumbnail.setImageBitmap(bitmap)
+                    binding.ivReceiptThumbnail.visibility = View.VISIBLE
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error decoding image: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun loadCategories() {
         viewModel.loadCategories(userId)
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
             categoriesList = categories
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories.map { it.name })
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinnerCategory.adapter = adapter
+            binding.spinnerCategory.adapter = adapter
+        }
+    }
+
+    private fun saveTransaction() {
+        val amount = binding.etAmount.text.toString().toDoubleOrNull()
+        val categoryIndex = binding.spinnerCategory.selectedItemPosition
+        
+        if (amount == null || amount <= 0 || selectedDate.isEmpty() || categoryIndex < 0) {
+            Snackbar.make(binding.root, "Please complete all fields (Amount, Date, Category)", Snackbar.LENGTH_SHORT).show()
+            return
         }
 
-        tvDate.setOnClickListener {
-            val cal = Calendar.getInstance()
-            DatePickerDialog(requireContext(), { _, y, m, d ->
-                selectedDate = String.format("%04d-%02d-%02d", y, m+1, d)
-                tvDate.text = "Date: $selectedDate"
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-        }
+        val expense = Expense(
+            userId = userId,
+            categoryId = categoriesList[categoryIndex].id,
+            amount = amount,
+            date = selectedDate,
+            startTime = selectedStartTime,
+            endTime = selectedEndTime,
+            description = binding.etDescription.text.toString(),
+            photoPath = currentPhotoPath,
+            homeCurrencyAmount = amount
+        )
+        
+        viewModel.addExpense(expense)
+        Snackbar.make(binding.root, "Transaction Saved Successfully", Snackbar.LENGTH_SHORT).show()
+        
+        // Reset form for next entry
+        binding.etAmount.text?.clear()
+        binding.etDescription.text?.clear()
+        binding.ivReceiptThumbnail.visibility = View.GONE
+        currentPhotoPath = null
+    }
 
-        tvStartTime.setOnClickListener {
-            TimePickerDialog(requireContext(), { _, h, m ->
-                selectedStartTime = String.format("%02d:%02d", h, m)
-                tvStartTime.text = selectedStartTime
-            }, 0, 0, true).show()
-        }
-        tvEndTime.setOnClickListener {
-            TimePickerDialog(requireContext(), { _, h, m ->
-                selectedEndTime = String.format("%02d:%02d", h, m)
-                tvEndTime.text = selectedEndTime
-            }, 0, 0, true).show()
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("photo_path", currentPhotoPath)
+        outState.putString("date", selectedDate)
+        outState.putString("start_time", selectedStartTime)
+        outState.putString("end_time", selectedEndTime)
+    }
 
-        btnAttach.setOnClickListener {
-            val file = File(requireContext().filesDir, "receipt_${System.currentTimeMillis()}.jpg")
-            photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
-            takePicture.launch(photoUri!!)
-        }
-
-        btnSave.setOnClickListener {
-            val amount = etAmount.text.toString().toDoubleOrNull()
-            val selectedCategoryIndex = spinnerCategory.selectedItemPosition
-            
-            if (amount == null || amount <= 0 || selectedDate.isEmpty() || 
-                selectedStartTime.isEmpty() || selectedEndTime.isEmpty() || 
-                selectedCategoryIndex < 0) {
-                Snackbar.make(view, "Please fill all required fields", Snackbar.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val categoryId = categoriesList[selectedCategoryIndex].id
-
-            val expense = Expense(
-                userId = userId,
-                categoryId = categoryId,
-                amount = amount,
-                date = selectedDate,
-                startTime = selectedStartTime,
-                endTime = selectedEndTime,
-                description = etDescription.text.toString(),
-                photoPath = photoUri?.toString(),
-                homeCurrencyAmount = amount
-            )
-            viewModel.addExpense(expense)
-            Snackbar.make(view, "Expense saved", Snackbar.LENGTH_SHORT).show()
-            
-            // Reset fields
-            etAmount.text.clear()
-            etDescription.text.clear()
-        }
-
-        return view
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

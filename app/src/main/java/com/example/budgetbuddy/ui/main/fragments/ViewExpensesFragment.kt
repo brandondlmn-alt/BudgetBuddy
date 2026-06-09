@@ -67,8 +67,13 @@ class ViewExpensesFragment : Fragment() {
 
         viewModel.expenses.observe(viewLifecycleOwner) { list ->
             rvExpenses.adapter = ExpenseAdapter(list) { expense ->
-                // Handle photo click if needed
-                Toast.makeText(requireContext(), "Photo: ${expense.photoPath}", Toast.LENGTH_SHORT).show()
+                if (!expense.photoPath.isNullOrEmpty()) {
+                    // Launch full screen receipt preview
+                    val previewDialog = ReceiptPreviewDialog(expense.photoPath)
+                    previewDialog.show(parentFragmentManager, "receipt_preview")
+                } else {
+                    Toast.makeText(requireContext(), "No receipt attached to this expense", Toast.LENGTH_SHORT).show()
+                }
             }
             tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
         }

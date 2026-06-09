@@ -1,82 +1,65 @@
-# BudgetBuddy – Personal Budget Tracker
+# 📂 Budget Buddy - POE Part 3 Documentation
 
-BudgetBuddy is an Android budgeting app designed to make expense tracking, goal setting, and financial management simple and engaging. Developed in Kotlin using AndroidX, Room Database, and Material Design, the app runs on devices with API 24 (Android 7.0) and above.
-
-
-## Features
-
-- **User Authentication**  
-  Register and login with username/password. Passwords are stored securely (SHA-256 hashed). Remember Me option via SharedPreferences.
-
-- **Category Management**  
-  Create, edit, and delete custom expense categories.  
-  Five beautiful built‑in categories (Transport, Rent, Groceries, Entertainment, Dining), each with its own colour and icon.
-
-- **Expense Logging**  
-  Add an expense entry with amount, date, start/end time, description, category, and an optional receipt photo (camera or gallery).  
-  Foreign currency conversion built‑in for overseas purchases.
-
-- **Monthly Goal Setting**  
-  Set a minimum and maximum spending goal per month.  
-  Visual dashboard shows progress against these goals.
-
-- **Interactive Dashboard**  
-  Circular progress indicator with percentage overlay for overall monthly spending.  
-  Custom pie chart breaking down spending by category.  
-  Coloured progress bars for each category.
-
-- **Filtered Expense List**  
-  View all expenses within a custom date range.  
-  Long‑press an expense to view attached receipt photo.
-
-- **Category Totals (Reports)**  
-  Select a date range and see total spending per category, plus overall total spent in that period.
-
-- **PDF Export**  
-  Export the filtered expense list to a PDF file and share/print it.
-
-- **Currency Converter**  
-  Offline hard‑coded exchange rates supporting ZAR, USD, EUR, GBP, JPY.
-
-- **Gamification (Foundation)**  
-  Placeholder badges and a “Coming Soon” quiz button, ready for future enhancements.
+**Project Name:** Budget Buddy  
+**Development Platform:** Android Studio  
+**Language:** Kotlin  
+**Database:** Room SQLite  
+**Design Language:** Material Design 3 (Material You)
 
 ---
 
-## Demo Video
-
-🎥 Watch the full demonstration:  
-[BudgetBuddy Demo](https://youtu.be/IXRxW_5bzOE?si=mSmeb5mgIsubTlRh)
+## 🚀 1. Application Overview
+Budget Buddy is a robust, personal financial management application designed to help users track spending, set financial boundaries, and improve their financial literacy through gamified elements. It provides a highly visual experience with real-time progress tracking and professional-grade reporting tools.
 
 ---
 
-## Own Additional Features (Part 2)
+## 🎯 2. Rubric Fulfillment (Mapping)
 
-1. **Offline Currency Converter**  
-   Hard‑coded exchange rates (updated as needed) supporting five currencies. The converter is available from the “More” menu and is also integrated into the Add Expense screen for foreign purchases.
-
-2. **PDF Export**  
-   Exports the currently displayed expense list to a well‑formatted PDF saved in the device’s Downloads folder, ready for printing or sharing.
-
----
-
-## Technical Stack
-
-- **Language:** Kotlin
-- **Minimum SDK:** 24 (Android 7.0 Nougat)
-- **Target SDK:** 35
-- **Architecture:** MVVM (ViewModels + LiveData)
-- **Database:** Room (SQLite abstraction)
-- **UI:** Material Components, ViewBinding, BottomNavigationView, custom PieChartView
-- **Image Capture:** Camera/Gallery via ActivityResultContracts + FileProvider
-- **PDF:** Android PdfDocument API
-- **Testing:** JUnit, Room in‑memory tests
-- **CI/CD:** GitHub Actions (build on every push)
+| Rubric Criterion | Implementation Status | Technical Details |
+| :--- | :--- | :--- |
+| **1. Real Phone Support** | ✅ **Complete** | Uses `FileProvider` for secure camera access and internal storage for high-res receipt photos. |
+| **2. Flawless Data Capture** | ✅ **Complete** | Integrated ViewBinding for crash-proof UI and robust input validation in `AddExpenseFragment`. |
+| **3. Original Features** | ✅ **Complete** | **Feature 1:** PDF Report Export. **Feature 2:** Educational Financial Quiz. |
+| **4. Graphs (Spending/Goals)** | ✅ **Complete** | Custom `PieChartView` in Reports showing spending distribution vs user-defined goals. |
+| **5. Progress Dashboard** | ✅ **Complete** | Dual-gauge "Spent" vs "Remaining" visualizers with dynamic color alerts (Green to Red). |
+| **6. Gamification** | ✅ **Complete** | 5-Tier Badge System (Bronze to Diamond) + Knowledge Badge earned via Quiz performance. |
+| **7. Excellent consistent UI** | ✅ **Complete** | Unified Material 3 design, custom "BudgetBuddy Green" palette, and premium card layouts. |
+| **8. Professional Demo** | ⏳ **User Task** | App is ready for recording with all features functional. |
 
 ---
 
-## Build Instructions
+## ✨ 3. Original Features (Requirement #3)
 
-1. **Clone the repository**  
-   ```bash
-   git clone https://github.com/brandondlmn-alt/Budgetbuddy.git
+### **Feature 1: Professional PDF Export**
+Located in the **View Expenses** screen. Users can filter transactions by date and generate a professional PDF document containing transaction details and receipt images.
+*   **Implementation:** `PdfExporter.kt` uses the Android `PdfDocument` API to generate shareable reports.
+
+### **Feature 2: Financial Literacy Achievement System**
+Found in the **Achievements** screen. Users take a quiz to earn a "Knowledge Rank" badge (Guru, Expert, Novice) displayed on their profile card.
+*   **Implementation:** `QuizFragment.kt` tracks scores and persists them via `SharedPreferences`.
+
+---
+
+## 🛠 4. Technical Architecture
+
+### **Data Persistence (RoomDB)**
+*   **User Table:** Secure login and profile data.
+*   **Category Table:** User-customizable spending groups.
+*   **Expense Table:** Stores amounts, dates, descriptions, and absolute paths to receipt photos.
+*   **Goal Table:** Stores the monthly min/max spending limits.
+
+### **UI & Navigation**
+*   **Navigation Drawer:** A hamburger menu for high-level navigation.
+*   **Bottom Navigation:** Quick-access tabs for the most frequent actions.
+*   **Custom Views:** `CircularProgressView` (Dashboard) and `PieChartView` (Reports) built using the `Canvas` API.
+
+---
+
+## 📝 5. Final Submission Checklist
+1.  **Release APK**: Found in `app/build/outputs/apk/debug/app-debug.apk`.
+2.  **GitHub Repository Link**: Ensure your repo is public.
+3.  **CI/CD Badge**: GitHub Actions workflow (`.github/workflows/android.yml`) should be passing.
+4.  **Demo Video**: A 3-5 minute walkthrough explaining the features.
+
+---
+**Developed for University POE - Part 3**

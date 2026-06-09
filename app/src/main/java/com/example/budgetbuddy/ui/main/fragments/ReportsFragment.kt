@@ -1,6 +1,7 @@
 package com.example.budgetbuddy.ui.main.fragments
 
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.budgetbuddy.databinding.FragmentReportsBinding
 import com.example.budgetbuddy.ui.main.viewmodels.ReportsViewModel
+import com.example.budgetbuddy.ui.main.views.PieChartView
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -56,14 +58,28 @@ class ReportsFragment : Fragment() {
         }
 
         viewModel.categoryTotals.observe(viewLifecycleOwner) { list ->
-            val totalOverall = list.sumOf { it.second }  // sum of all category amounts
-            binding.textTotalOverall.text = "R ${String.format("%.2f", totalOverall)}"
+            val totalOverall = list.sumOf { it.second }
+            binding.textTotalOverall.text = "Total: R ${String.format("%.2f", totalOverall)}"
 
-            val formatted = list.joinToString("\n") { "${it.first.name}: R ${String.format("%.2f", it.second)}" }
-            binding.textTotals.text = formatted
+            val slices = mutableListOf<PieChartView.Slice>()
+            val breakdown = StringBuilder()
+
+            list.forEach { (category, amount) ->
+                if (amount > 0) {
+                    val color = try {
+                        Color.parseColor(category.colorCode)
+                    } catch (e: Exception) {
+                        Color.GRAY
+                    }
+                    slices.add(PieChartView.Slice(category.name, amount.toFloat(), color))
+                    breakdown.append("${category.name}: R ${String.format("%.2f", amount)}\n")
+                }
+            }
+
+            binding.pieChartView.slices = slices
+            binding.textTotals.text = if (breakdown.isEmpty()) "No data available for this period." else breakdown.toString()
         }
 
-        // Load initially
         binding.btnFilter.performClick()
     }
 
