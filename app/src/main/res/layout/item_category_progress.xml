@@ -44,7 +44,7 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
-            android:progressDrawable="@drawable/category_icon_bg" />
+            android:progressDrawable="@drawable/horizontal_progress_drawable" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -8,9 +8,13 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.budgetbuddy.AppPreferences
 import com.example.budgetbuddy.R
+import com.example.budgetbuddy.data.database.DatabaseProvider
 import com.example.budgetbuddy.databinding.FragmentQuizBinding
+import com.example.budgetbuddy.ui.main.MainActivity
+import kotlinx.coroutines.launch
 
 class QuizFragment : Fragment() {
 
@@ -74,7 +78,6 @@ class QuizFragment : Fragment() {
         
         displayQuestion()
 
-        // Improved Selection Highlighting
         binding.rgOptions.setOnCheckedChangeListener { group, checkedId ->
             for (i in 0 until group.childCount) {
                 val rb = group.getChildAt(i) as RadioButton
@@ -120,8 +123,19 @@ class QuizFragment : Fragment() {
 
         binding.btnFinish.setOnClickListener {
             val percentage = (score.toFloat() / questions.size * 100).toInt()
-            appPreferences.setQuizScore(percentage)
-            parentFragmentManager.popBackStack()
+            val finalScore = if (percentage == 0) 0 else percentage
+            
+            // Save score to Database instead of SharedPreferences to ensure data is fresh per user
+            val db = DatabaseProvider.getDatabase(requireContext())
+            lifecycleScope.launch {
+                val user = db.userDao().getUserById(userId)
+                if (user != null) {
+                    db.userDao().updateUser(user.copy(quizScore = finalScore))
+                    // Explicitly notify the Activity to refresh its UI
+                    (activity as? MainActivity)?.refreshHeader()
+                }
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 
@@ -135,7 +149,6 @@ class QuizFragment : Fragment() {
         binding.rbOption4.text = question.options[3]
         binding.rgOptions.clearCheck()
         
-        // Reset Visuals
         for (i in 0 until binding.rgOptions.childCount) {
             val rb = binding.rgOptions.getChildAt(i) as RadioButton
             rb.setBackgroundResource(R.drawable.category_icon_bg)
@@ -152,14 +165,6 @@ class QuizFragment : Fragment() {
 
         binding.llResult.visibility = View.VISIBLE
         binding.tvScore.text = "Your Score: $score / ${questions.size}"
-        
-        val percentage = (score.toFloat() / questions.size * 100).toInt()
-        val message = when {
-            percentage >= 80 -> "Excellent! You are a Financial Guru."
-            percentage >= 50 -> "Good job! You have solid money smarts."
-            else -> "Keep learning! Every step counts."
-        }
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

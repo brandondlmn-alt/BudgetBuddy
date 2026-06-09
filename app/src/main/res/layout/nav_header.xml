@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:gravity="center"
-    android:orientation="vertical"
+    android:layout_height="220dp"
     android:background="@color/primary"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/ic_default_avatar"
-        android:contentDescription="User avatar"
-        android:scaleType="centerCrop"
-        android:background="@drawable/circle_background" />
+    <!-- Profile Picture Container -->
+    <FrameLayout
+        android:id="@+id/avatar_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tv_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/circle_background"
+            android:contentDescription="User avatar"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_default_avatar" />
+
+        <!-- Knowledge Tier Badge (Bottom Right of Avatar) -->
+        <ImageView
+            android:id="@+id/iv_header_badge"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/circle_background"
+            android:padding="4dp"
+            android:src="@drawable/bronze_badge"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_username"
@@ -24,5 +47,23 @@
         android:text="User"
         android:textColor="@android:color/white"
         android:textSize="18sp"
-        android:textStyle="bold" />
-</LinearLayout>
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tv_user_tier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_container" />
+
+    <TextView
+        android:id="@+id/tv_user_tier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bronze Member"
+        android:textColor="@android:color/white"
+        android:alpha="0.8"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_username" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

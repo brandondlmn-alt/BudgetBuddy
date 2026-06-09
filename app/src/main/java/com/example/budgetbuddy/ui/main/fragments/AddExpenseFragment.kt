@@ -34,31 +34,27 @@ class AddExpenseFragment : Fragment() {
     
     private var userId: Int = -1
     private var selectedDate: String = ""
-    private var selectedStartTime: String = ""
-    private var selectedEndTime: String = ""
+    private var selectedStartTime: String = "00:00"
+    private var selectedEndTime: String = "23:59"
     private var currentPhotoPath: String? = null
     private lateinit var viewModel: AddExpenseViewModel
     private var categoriesList: List<Category> = emptyList()
 
-    private val TAG = "AddExpenseFragment"
+    private val FILE_PROVIDER_AUTHORITY = "com.example.budgetbuddy.fileprovider"
 
-    // 1. Contract for Camera Permission
     private val requestCameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
-            prepareAndLaunchCamera()
+            launchCamera()
         } else {
             Toast.makeText(requireContext(), "Camera permission is required to capture receipts", Toast.LENGTH_LONG).show()
         }
     }
 
-    // 2. Contract for taking the picture
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            Log.d(TAG, "Picture successfully saved to: $currentPhotoPath")
             displayThumbnail()
         } else {
-            Log.w(TAG, "Camera activity returned failure or was cancelled")
-            // Don't null out path immediately in case of fragment recreation issues
+            currentPhotoPath = null
         }
     }
 
@@ -81,19 +77,25 @@ class AddExpenseFragment : Fragment() {
         userId = arguments?.getInt("USER_ID") ?: -1
         viewModel = ViewModelProvider(this)[AddExpenseViewModel::class.java]
 
-        // Restore state if fragment was recreated
+        // Restore state
         savedInstanceState?.let {
             currentPhotoPath = it.getString("photo_path")
             selectedDate = it.getString("date", "")
-            selectedStartTime = it.getString("start_time", "")
-            selectedEndTime = it.getString("end_time", "")
-            
-            if (selectedDate.isNotEmpty()) binding.tvDate.text = "Date: $selectedDate"
-            displayThumbnail()
+            selectedStartTime = it.getString("start_time", "00:00")
+            selectedEndTime = it.getString("end_time", "23:59")
         }
 
+        updateDateTimeUI()
+        displayThumbnail()
+        
         setupListeners()
         loadCategories()
+    }
+
+    private fun updateDateTimeUI() {
+        binding.tvDate.text = if (selectedDate.isNotEmpty()) "Date: $selectedDate" else "Select Date"
+        binding.tvStartTime.text = "Start: $selectedStartTime"
+        binding.tvEndTime.text = "End: $selectedEndTime"
     }
 
     private fun setupListeners() {
@@ -105,8 +107,32 @@ class AddExpenseFragment : Fragment() {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
+        binding.tvStartTime.setOnClickListener {
+            val h = try { selectedStartTime.split(":")[0].toInt() } catch(e: Exception) { 0 }
+            val m = try { selectedStartTime.split(":")[1].toInt() } catch(e: Exception) { 0 }
+            
+            TimePickerDialog(requireContext(), { _, hours, minutes ->
+                selectedStartTime = String.format("%02d:%02d", hours, minutes)
+                binding.tvStartTime.text = "Start: $selectedStartTime"
+            }, h, m, true).show()
+        }
+
+        binding.tvEndTime.setOnClickListener {
+            val h = try { selectedEndTime.split(":")[0].toInt() } catch(e: Exception) { 23 }
+            val m = try { selectedEndTime.split(":")[1].toInt() } catch(e: Exception) { 59 }
+
+            TimePickerDialog(requireContext(), { _, hours, minutes ->
+                selectedEndTime = String.format("%02d:%02d", hours, minutes)
+                binding.tvEndTime.text = "End: $selectedEndTime"
+            }, h, m, true).show()
+        }
+
         binding.btnAttachReceipt.setOnClickListener {
-            checkCameraPermissionAndLaunch()
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                launchCamera()
+            } else {
+                requestCameraPermission.launch(Manifest.permission.CAMERA)
+            }
         }
 
         binding.btnSave.setOnClickListener {
@@ -114,28 +140,14 @@ class AddExpenseFragment : Fragment() {
         }
     }
 
-    private fun checkCameraPermissionAndLaunch() {
-        val permission = Manifest.permission.CAMERA
-        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            prepareAndLaunchCamera()
-        } else {
-            requestCameraPermission.launch(permission)
-        }
-    }
-
-    private fun prepareAndLaunchCamera() {
+    private fun launchCamera() {
         try {
-            // Using cacheDir is usually more reliable for FileProvider sharing with external apps
             val photoFile = File.createTempFile("receipt_", ".jpg", requireContext().cacheDir)
             currentPhotoPath = photoFile.absolutePath
-            
-            val authority = "${requireContext().packageName}.fileprovider"
-            val photoUri = FileProvider.getUriForFile(requireContext(), authority, photoFile)
-            
+            val photoUri = FileProvider.getUriForFile(requireContext(), FILE_PROVIDER_AUTHORITY, photoFile)
             takePicture.launch(photoUri)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to launch camera: ${e.message}")
-            Toast.makeText(requireContext(), "Camera error: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -144,17 +156,10 @@ class AddExpenseFragment : Fragment() {
         currentPhotoPath?.let { path ->
             val file = File(path)
             if (file.exists()) {
-                try {
-                    // Downsample to avoid memory issues (crashing on high-res photos)
-                    val options = BitmapFactory.Options().apply {
-                        inSampleSize = 4
-                    }
-                    val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
-                    binding.ivReceiptThumbnail.setImageBitmap(bitmap)
-                    binding.ivReceiptThumbnail.visibility = View.VISIBLE
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error decoding image: ${e.message}")
-                }
+                val options = BitmapFactory.Options().apply { inSampleSize = 4 }
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+                binding.ivReceiptThumbnail.setImageBitmap(bitmap)
+                binding.ivReceiptThumbnail.visibility = View.VISIBLE
             }
         }
     }
@@ -191,13 +196,17 @@ class AddExpenseFragment : Fragment() {
         )
         
         viewModel.addExpense(expense)
-        Snackbar.make(binding.root, "Transaction Saved Successfully", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, "Expense Saved Successfully", Snackbar.LENGTH_SHORT).show()
         
-        // Reset form for next entry
+        // Reset form
         binding.etAmount.text?.clear()
         binding.etDescription.text?.clear()
         binding.ivReceiptThumbnail.visibility = View.GONE
         currentPhotoPath = null
+        selectedDate = ""
+        selectedStartTime = "00:00"
+        selectedEndTime = "23:59"
+        updateDateTimeUI()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

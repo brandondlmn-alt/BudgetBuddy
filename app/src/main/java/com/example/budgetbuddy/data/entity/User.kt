@@ -8,5 +8,9 @@ data class User(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val username: String,
-    val passwordHash: String
+    val passwordHash: String,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val age: Int? = null,
+    val quizScore: Int = -1 // Default -1 means quiz not taken
 )

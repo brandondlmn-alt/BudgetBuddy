@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.constraintlayout)
 
     // Lifecycle + ViewModel + LiveData
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

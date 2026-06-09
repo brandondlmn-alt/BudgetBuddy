@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.example.budgetbuddy.BudgetBuddyApplication
 import com.example.budgetbuddy.databinding.FragmentReportsBinding
 import com.example.budgetbuddy.ui.main.viewmodels.ReportsViewModel
 import com.example.budgetbuddy.ui.main.views.PieChartView
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -54,7 +57,10 @@ class ReportsFragment : Fragment() {
         }
 
         binding.btnFilter.setOnClickListener {
-            viewModel.loadTotals(userId, binding.editStartDate.text.toString(), binding.editEndDate.text.toString())
+            val start = binding.editStartDate.text.toString()
+            val end = binding.editEndDate.text.toString()
+            viewModel.loadTotals(userId, start, end)
+            updateGoalReference(start)
         }
 
         viewModel.categoryTotals.observe(viewLifecycleOwner) { list ->
@@ -77,10 +83,24 @@ class ReportsFragment : Fragment() {
             }
 
             binding.pieChartView.slices = slices
-            binding.textTotals.text = if (breakdown.isEmpty()) "No data available for this period." else breakdown.toString()
+            binding.textTotals.text = if (breakdown.isEmpty()) "No data for this period." else breakdown.toString()
         }
 
         binding.btnFilter.performClick()
+    }
+
+    private fun updateGoalReference(startDate: String) {
+        val monthKey = startDate.substring(0, 7) // Extract YYYY-MM
+        val db = (requireActivity().application as BudgetBuddyApplication).database
+        
+        lifecycleScope.launch {
+            val goal = db.goalDao().getGoalForUserAndMonth(userId, monthKey)
+            goal?.let {
+                val goalText = "Monthly Goal: R ${it.minAmount} (Min) - R ${it.maxAmount} (Max)"
+                // Dynamically update the summary with Goal info to satisfy Requirement #4
+                binding.textTotalOverall.append("\n\n$goalText")
+            }
+        }
     }
 
     override fun onDestroyView() {

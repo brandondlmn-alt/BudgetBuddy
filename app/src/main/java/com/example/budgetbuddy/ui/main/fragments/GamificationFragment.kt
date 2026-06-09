@@ -32,7 +32,8 @@ class GamificationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         binding.btnQuiz.setOnClickListener {
-            val quizFragment = QuizFragment()
+            // Fix: Use newInstance to correctly pass the userId to the QuizFragment
+            val quizFragment = QuizFragment.newInstance(userId)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, quizFragment)
                 .addToBackStack(null)

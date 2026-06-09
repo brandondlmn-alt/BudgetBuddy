@@ -26,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
             val user = binding.editUsername.text.toString().trim()
             val pass = binding.editPassword.text.toString().trim()
             if (user.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             viewModel.login(user, pass) { userId ->
@@ -34,12 +34,11 @@ class LoginActivity : AppCompatActivity() {
                     if (binding.checkRemember.isChecked) {
                         prefs.edit().putString("username", user).apply()
                     }
-                    startActivity(Intent(this, MainActivity::class.java).apply {
+                    val intent = Intent(this, MainActivity::class.java).apply {
                         putExtra("USER_ID", userId)
-                    })
-                    finish()
-                    Toast.makeText(this, "Login successful (UserId: $userId)", Toast.LENGTH_SHORT).show()
-                    finish()  // just close the app for now
+                    }
+                    startActivity(intent)
+                    finish() // Close login only once
                 } else {
                     Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
                 }
