@@ -3,89 +3,145 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface"
-    android:padding="16dp">
+    android:background="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <!-- Overall Goal Header -->
         <TextView
-            android:id="@+id/textMonthGoal"
+            android:id="@+id/tv_month_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Month Goal: R 0.00 / R 0.00"
-            android:textSize="16sp"
+            android:text="Financial Status"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="@color/primary"
-            android:layout_marginBottom="8dp"/>
+            android:textColor="@color/on_surface"
+            android:layout_marginBottom="24dp" />
 
-        <!-- Larger circular progress with percentage inside -->
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="8dp">
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:baselineAligned="false">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/circularProgress"
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:progress="0"
-                app:indicatorColor="@color/progress_green"
-                app:indicatorSize="140dp"
-                app:trackThickness="10dp" />
-
-            <TextView
-                android:id="@+id/textProgressPercent"
-                android:layout_width="wrap_content"
+            <!-- Spent Graph Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="0%"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:textColor="@color/on_surface" />
-        </FrameLayout>
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Spent"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.example.budgetbuddy.ui.CircularProgressView
+                        android:id="@+id/progress_spent"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp" />
+
+                    <TextView
+                        android:id="@+id/tv_spent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="R 0.00"
+                        android:textColor="@color/on_surface"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Remaining Graph Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Remaining"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.example.budgetbuddy.ui.CircularProgressView
+                        android:id="@+id/progress_remaining"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp" />
+
+                    <TextView
+                        android:id="@+id/tv_remaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="R 0.00"
+                        android:textColor="@color/on_surface"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/textTotalSpent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/on_surface"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Pie Chart -->
-        <com.example.budgetbuddy.ui.main.views.PieChartView
-            android:id="@+id/pieChart"
+            android:id="@+id/tv_stats"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textAlignment="center"
+            android:text="Logging your journey to financial freedom"
+            android:textColor="@color/on_surface"
+            android:alpha="0.7" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Category Breakdown"
+            android:layout_marginTop="32dp"
+            android:text="Spending by Category"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/on_surface"
-            android:layout_marginBottom="8dp"/>
+            android:textColor="@color/on_surface" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerCategoryProgress"
+        <LinearLayout
+            android:id="@+id/container_categories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
+            android:orientation="vertical"
+            android:layout_marginTop="12dp" />
 
         <Button
-            android:id="@+id/btnAddExpense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Add Expense"
-            android:layout_marginTop="12dp"/>
+            android:id="@+id/btn_add_expense"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:text="Add New Expense"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            app:cornerRadius="12dp" />
+
     </LinearLayout>
 </ScrollView>

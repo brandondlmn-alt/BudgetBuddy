@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.budgetbuddy.BudgetBuddyApplication
+import com.example.budgetbuddy.R
 import com.example.budgetbuddy.databinding.FragmentGamificationBinding
 import kotlinx.coroutines.launch
 
@@ -29,14 +30,62 @@ class GamificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        binding.btnQuiz.setOnClickListener {
+            val quizFragment = QuizFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, quizFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
         lifecycleScope.launch {
             val totalExp = db.expenseDao().getTotalExpenseCount(userId)
-            val receiptCount = db.expenseDao().getReceiptCount(userId)
-            binding.txtBadge1.text = "Budget Beginner: $totalExp/10 expenses logged"
-            binding.progress1.progress = (totalExp * 10).coerceAtMost(100)
-            binding.txtBadge2.text = "Receipt Rockstar: $receiptCount/5 receipts attached"
-            binding.progress2.progress = (receiptCount * 20).coerceAtMost(100)
 
+            // Bronze Tier: 1 Expense
+            binding.progressBronze.progress = if (totalExp >= 1) 1 else 0
+            if (totalExp >= 1) {
+                binding.badgeBronze.alpha = 1.0f
+                binding.tvBronzeStatus.text = "Bronze Tier: Achieved!"
+            } else {
+                binding.tvBronzeStatus.text = "Log 1 expense to unlock"
+            }
+
+            // Silver Tier: 10 Expenses
+            binding.progressSilver.progress = totalExp.coerceAtMost(10)
+            if (totalExp >= 10) {
+                binding.badgeSilver.alpha = 1.0f
+                binding.tvSilverStatus.text = "Silver Tier: Achieved!"
+            } else {
+                binding.tvSilverStatus.text = "Log $totalExp/10 expenses"
+            }
+
+            // Gold Tier: 50 Expenses
+            binding.progressGold.progress = totalExp.coerceAtMost(50)
+            if (totalExp >= 50) {
+                binding.badgeGold.alpha = 1.0f
+                binding.tvGoldStatus.text = "Gold Tier: Achieved!"
+            } else {
+                binding.tvGoldStatus.text = "Log $totalExp/50 expenses"
+            }
+
+            // Platinum Tier: 100 Expenses
+            binding.progressPlatinum.progress = totalExp.coerceAtMost(100)
+            if (totalExp >= 100) {
+                binding.badgePlatinum.alpha = 1.0f
+                binding.tvPlatinumStatus.text = "Platinum Tier: Achieved!"
+            } else {
+                binding.tvPlatinumStatus.text = "Log $totalExp/100 expenses"
+            }
+
+            // Diamond Tier: 250 Expenses
+            binding.progressDiamond.progress = totalExp.coerceAtMost(250)
+            if (totalExp >= 250) {
+                binding.badgeDiamond.alpha = 1.0f
+                binding.tvDiamondStatus.text = "Diamond Tier: Achieved!"
+            } else {
+                binding.tvDiamondStatus.text = "Log $totalExp/250 expenses"
+            }
         }
     }
 

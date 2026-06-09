@@ -1,49 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Achievements"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+    android:background="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="16dp">
+        android:padding="20dp">
 
         <TextView
-            android:id="@+id/txtBadge1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
-        <ProgressBar
-            android:id="@+id/progress1"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="8dp" />
+            android:text="Achievements"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/txtBadge2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
-        <ProgressBar
-            android:id="@+id/progress2"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:text="Level up your financial status by logging more transactions!"
+            android:textSize="14sp"
+            android:alpha="0.6"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Bronze Tier (1 Expense) -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="8dp" />
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/badge_bronze"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/bronze_badge"
+                    android:alpha="0.3" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bronze Tier"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_bronze_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log 1 expense to unlock"
+                        android:textSize="12sp"
+                        android:alpha="0.7" />
+                    <ProgressBar
+                        android:id="@+id/progress_bronze"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="8dp"
+                        android:max="1" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Silver Tier (10 Expenses) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/badge_silver"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/silver_badge"
+                    android:alpha="0.3" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Silver Tier"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_silver_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log 10 expenses"
+                        android:textSize="12sp"
+                        android:alpha="0.7" />
+                    <ProgressBar
+                        android:id="@+id/progress_silver"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="8dp"
+                        android:max="10" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Gold Tier (50 Expenses) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/badge_gold"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/gold_medal"
+                    android:alpha="0.3" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gold Tier"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_gold_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log 50 expenses"
+                        android:textSize="12sp"
+                        android:alpha="0.7" />
+                    <ProgressBar
+                        android:id="@+id/progress_gold"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="8dp"
+                        android:max="50" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Platinum Tier (100 Expenses) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/badge_platinum"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/platinum_badge"
+                    android:alpha="0.3" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Platinum Tier"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_platinum_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log 100 expenses"
+                        android:textSize="12sp"
+                        android:alpha="0.7" />
+                    <ProgressBar
+                        android:id="@+id/progress_platinum"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="8dp"
+                        android:max="100" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Diamond Tier (250 Expenses) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="24dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/badge_diamond"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/diamond_badge"
+                    android:alpha="0.3" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Diamond Tier"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_diamond_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log 250 expenses"
+                        android:textSize="12sp"
+                        android:alpha="0.7" />
+                    <ProgressBar
+                        android:id="@+id/progress_diamond"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="8dp"
+                        android:max="250" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <Button
+            android:id="@+id/btnQuiz"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Take Financial Literacy Quiz"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnQuiz"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quiz - Coming Soon" />
-</LinearLayout>
+</ScrollView>

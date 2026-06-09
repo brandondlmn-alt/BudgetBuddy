@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Financial Literacy Quiz"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tv_question_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Question 1 of 5"
+            android:textSize="14sp"
+            android:alpha="0.6"
+            android:layout_marginBottom="24dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tv_question_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:text="What is a recommended percentage of income to save each month?"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/on_surface"
+                android:gravity="center" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <RadioGroup
+            android:id="@+id/rg_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_option1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5%"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/category_icon_bg"
+                android:button="@null" />
+
+            <RadioButton
+                android:id="@+id/rb_option2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10%"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/category_icon_bg"
+                android:button="@null" />
+
+            <RadioButton
+                android:id="@+id/rb_option3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="20%"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/category_icon_bg"
+                android:button="@null" />
+
+            <RadioButton
+                android:id="@+id/rb_option4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="50%"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/category_icon_bg"
+                android:button="@null" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:text="Next Question"
+            android:textSize="18sp"
+            app:cornerRadius="12dp" />
+
+        <LinearLayout
+            android:id="@+id/ll_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Score: 4/5"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btn_finish"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Finish Quiz"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

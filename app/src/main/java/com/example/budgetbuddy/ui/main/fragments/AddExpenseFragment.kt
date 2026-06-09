@@ -2,8 +2,6 @@ package com.example.budgetbuddy.ui.main.fragments
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,22 +9,35 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.example.budgetbuddy.R
-import com.example.budgetbuddy.data.converter.ExchangeRates
 import com.example.budgetbuddy.data.entity.Category
-import com.example.budgetbuddy.databinding.FragmentAddExpenseBinding
+import com.example.budgetbuddy.data.entity.Expense
 import com.example.budgetbuddy.ui.main.viewmodels.AddExpenseViewModel
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.io.FileOutputStream
-import java.time.LocalDate
-import java.time.LocalTime
+import java.util.*
 
 class AddExpenseFragment : Fragment() {
+
+    private var userId: Int = -1
+    private var selectedDate: String = ""
+    private var selectedStartTime: String = ""
+    private var selectedEndTime: String = ""
+    private var photoUri: Uri? = null
+    private lateinit var viewModel: AddExpenseViewModel
+    private var categoriesList: List<Category> = emptyList()
+
+    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            view?.findViewById<ImageView>(R.id.iv_receipt_thumbnail)?.apply {
+                setImageURI(photoUri)
+                visibility = View.VISIBLE
+            }
+        }
+    }
 
     companion object {
         fun newInstance(userId: Int) = AddExpenseFragment().apply {
@@ -34,178 +45,91 @@ class AddExpenseFragment : Fragment() {
         }
     }
 
-    private var _binding: FragmentAddExpenseBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: AddExpenseViewModel by viewModels()
-    private val userId by lazy { requireArguments().getInt("USER_ID") }
-    private var photoUri: Uri? = null
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_add_expense, container, false)
+        userId = arguments?.getInt("USER_ID") ?: -1
+        viewModel = ViewModelProvider(this)[AddExpenseViewModel::class.java]
 
-    // Permission launchers
-    private val requestCameraPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) launchCamera()
-            else Toast.makeText(requireContext(), "Camera permission needed for photo", Toast.LENGTH_SHORT).show()
-        }
+        val tvDate = view.findViewById<TextView>(R.id.tv_date)
+        val tvStartTime = view.findViewById<TextView>(R.id.tv_start_time)
+        val tvEndTime = view.findViewById<TextView>(R.id.tv_end_time)
+        val spinnerCategory = view.findViewById<Spinner>(R.id.spinner_category)
+        val etAmount = view.findViewById<EditText>(R.id.et_amount)
+        val etDescription = view.findViewById<EditText>(R.id.et_description)
+        val btnAttach = view.findViewById<Button>(R.id.btn_attach_receipt)
+        val btnSave = view.findViewById<Button>(R.id.btn_save)
 
-    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success && photoUri != null) {
-            binding.imagePreview.setImageURI(photoUri)
-            binding.imagePreview.visibility = View.VISIBLE
-            viewModel.photoPath = getRealPathFromURI(photoUri!!)
-        }
-    }
-
-    private val pickPhoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            binding.imagePreview.setImageURI(it)
-            binding.imagePreview.visibility = View.VISIBLE
-            viewModel.photoPath = getRealPathFromURI(it)
-        }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentAddExpenseBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        // Observe Categories
         viewModel.loadCategories(userId)
-        binding.btnSave.isEnabled = false
-
-        viewModel.categories.observe(viewLifecycleOwner) { cats ->
-            if (cats.isEmpty()) {
-                Toast.makeText(requireContext(), "Add categories first!", Toast.LENGTH_SHORT).show()
-                return@observe
-            }
-            val adapter = object : ArrayAdapter<Category>(requireContext(), R.layout.item_category_spinner, cats) {
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_category_spinner, parent, false)
-                    val cat = getItem(position)!!
-                    val icon = view.findViewById<TextView>(R.id.iconText)
-                    val name = view.findViewById<TextView>(R.id.categoryName)
-                    icon.text = cat.iconText
-                    val bg = ContextCompat.getDrawable(context, R.drawable.category_icon_bg)?.mutate()
-                    bg?.setTint(Color.parseColor(cat.colorCode))
-                    icon.background = bg
-                    name.text = cat.name
-                    return view
-                }
-                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    return getView(position, convertView, parent)
-                }
-            }
-            binding.spinnerCategory.adapter = adapter
-            binding.btnSave.isEnabled = true
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            categoriesList = categories
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories.map { it.name })
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerCategory.adapter = adapter
         }
 
-        // Date picker
-        binding.editDate.setOnClickListener {
-            val now = LocalDate.now()
+        tvDate.setOnClickListener {
+            val cal = Calendar.getInstance()
             DatePickerDialog(requireContext(), { _, y, m, d ->
-                binding.editDate.setText("$y-${String.format("%02d", m+1)}-${String.format("%02d", d)}")
-            }, now.year, now.monthValue - 1, now.dayOfMonth).show()
+                selectedDate = String.format("%04d-%02d-%02d", y, m+1, d)
+                tvDate.text = "Date: $selectedDate"
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        // Time pickers
-        binding.editStartTime.setOnClickListener {
-            val now = LocalTime.now()
-            TimePickerDialog(requireContext(), { _, h, min ->
-                binding.editStartTime.setText("${String.format("%02d", h)}:${String.format("%02d", min)}")
-            }, now.hour, now.minute, true).show()
+        tvStartTime.setOnClickListener {
+            TimePickerDialog(requireContext(), { _, h, m ->
+                selectedStartTime = String.format("%02d:%02d", h, m)
+                tvStartTime.text = selectedStartTime
+            }, 0, 0, true).show()
         }
-        binding.editEndTime.setOnClickListener {
-            val now = LocalTime.now()
-            TimePickerDialog(requireContext(), { _, h, min ->
-                binding.editEndTime.setText("${String.format("%02d", h)}:${String.format("%02d", min)}")
-            }, now.hour, now.minute, true).show()
-        }
-
-        // Attach photo
-        binding.btnAttachPhoto.setOnClickListener {
-            val options = arrayOf("Take Photo", "Choose from Gallery")
-            AlertDialog.Builder(requireContext())
-                .setItems(options) { _, which ->
-                    if (which == 0) {
-                        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
-                            == PackageManager.PERMISSION_GRANTED) {
-                            launchCamera()
-                        } else {
-                            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-                        }
-                    } else {
-                        pickPhoto.launch("image/*")
-                    }
-                }
-                .show()
+        tvEndTime.setOnClickListener {
+            TimePickerDialog(requireContext(), { _, h, m ->
+                selectedEndTime = String.format("%02d:%02d", h, m)
+                tvEndTime.text = selectedEndTime
+            }, 0, 0, true).show()
         }
 
-        // Foreign currency
-        binding.switchForeign.setOnCheckedChangeListener { _, isChecked ->
-            binding.layoutForeign.visibility = if (isChecked) View.VISIBLE else View.GONE
-        }
-        binding.btnConvert.setOnClickListener {
-            val from = binding.spinnerCurrency.selectedItem.toString()
-            val amount = binding.editForeignAmount.text.toString().toDoubleOrNull() ?: 0.0
-            val home = ExchangeRates.convert(amount, from, "ZAR")
-            binding.textConvertedAmount.text = "Home: R ${String.format("%.2f", home)}"
-            binding.editAmount.setText(String.format("%.2f", home))
+        btnAttach.setOnClickListener {
+            val file = File(requireContext().filesDir, "receipt_${System.currentTimeMillis()}.jpg")
+            photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
+            takePicture.launch(photoUri!!)
         }
 
-        // Save expense
-        binding.btnSave.setOnClickListener {
-            val amount = binding.editAmount.text.toString().toDoubleOrNull()
-            val date = binding.editDate.text.toString()
-            val start = binding.editStartTime.text.toString()
-            val end = binding.editEndTime.text.toString()
-            val desc = binding.editDescription.text.toString()
-            val categoryPos = binding.spinnerCategory.selectedItemPosition
-            val categories = viewModel.categories.value
-
-            if (categories == null || categories.isEmpty()) {
-                Toast.makeText(requireContext(), "No categories available. Add one first.", Toast.LENGTH_SHORT).show()
+        btnSave.setOnClickListener {
+            val amount = etAmount.text.toString().toDoubleOrNull()
+            val selectedCategoryIndex = spinnerCategory.selectedItemPosition
+            
+            if (amount == null || amount <= 0 || selectedDate.isEmpty() || 
+                selectedStartTime.isEmpty() || selectedEndTime.isEmpty() || 
+                selectedCategoryIndex < 0) {
+                Snackbar.make(view, "Please fill all required fields", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (categoryPos == AdapterView.INVALID_POSITION || categoryPos >= categories.size || amount == null || date.isEmpty() || start.isEmpty() || end.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val categoryId = categories[categoryPos].id
-            val foreignCurrency = if (binding.switchForeign.isChecked) binding.spinnerCurrency.selectedItem.toString() else null
-            viewModel.saveExpense(userId, categoryId, amount, date, start, end, desc, foreignCurrency, amount)
-            Toast.makeText(requireContext(), "Expense saved", Toast.LENGTH_SHORT).show()
-            activity?.supportFragmentManager?.popBackStack()
+
+            val categoryId = categoriesList[selectedCategoryIndex].id
+
+            val expense = Expense(
+                userId = userId,
+                categoryId = categoryId,
+                amount = amount,
+                date = selectedDate,
+                startTime = selectedStartTime,
+                endTime = selectedEndTime,
+                description = etDescription.text.toString(),
+                photoPath = photoUri?.toString(),
+                homeCurrencyAmount = amount
+            )
+            viewModel.addExpense(expense)
+            Snackbar.make(view, "Expense saved", Snackbar.LENGTH_SHORT).show()
+            
+            // Reset fields
+            etAmount.text.clear()
+            etDescription.text.clear()
         }
-    }
 
-    private fun launchCamera() {
-        val photoFile = File(requireActivity().externalCacheDir, "receipt_${System.currentTimeMillis()}.jpg")
-        photoUri = FileProvider.getUriForFile(
-            requireContext(),
-            "${requireContext().packageName}.fileprovider",
-            photoFile
-        )
-        takePicture.launch(photoUri!!)
-    }
-
-    private fun getRealPathFromURI(uri: Uri): String? {
-        return if (uri.scheme == "content") {
-            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
-            val file = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
-            FileOutputStream(file).use { output ->
-                inputStream.copyTo(output)
-            }
-            file.absolutePath
-        } else if (uri.scheme == "file") {
-            uri.path
-        } else {
-            null
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return view
     }
 }

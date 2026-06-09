@@ -18,6 +18,12 @@ class AddExpenseViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun addExpense(expense: Expense) {
+        viewModelScope.launch {
+            db.expenseDao().insertExpense(expense)
+        }
+    }
+
     fun saveExpense(userId: Int, categoryId: Int, amount: Double, date: String, start: String, end: String,
                     desc: String, originalCurrency: String?, homeAmount: Double) {
         viewModelScope.launch {

@@ -26,20 +26,31 @@ class CurrencyConverterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
         val currencies = arrayOf("ZAR", "USD", "EUR", "GBP", "JPY")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        
         binding.spinnerFrom.adapter = adapter
         binding.spinnerTo.adapter = adapter
 
         binding.btnConvert.setOnClickListener {
-            val amount = binding.editAmount.text.toString().toDoubleOrNull() ?: 0.0
+            val amount = binding.editAmount.text.toString().toDoubleOrNull()
+            if (amount == null || amount <= 0) {
+                binding.editAmount.error = "Enter a valid amount"
+                return@setOnClickListener
+            }
+
             val from = binding.spinnerFrom.selectedItem as String
             val to = binding.spinnerTo.selectedItem as String
             val result = ExchangeRates.convert(amount, from, to)
-            binding.textResult.text = "Result: ${String.format("%.2f", result)} $to"
+            
+            binding.textResult.text = "${String.format("%.2f", result)} $to"
+            binding.textLastUpdated.text = "Rates as of: ${ExchangeRates.LAST_UPDATED}"
+            
+            // Show result card with animation-like visibility
+            binding.cardResult.visibility = View.VISIBLE
         }
-        binding.textLastUpdated.text = "Rates as of: ${ExchangeRates.LAST_UPDATED}"
     }
 
     override fun onDestroyView() {

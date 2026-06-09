@@ -3,49 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="1dp"
-    app:cardBackgroundColor="@color/white"
-    app:strokeWidth="0.5dp"
-    app:strokeColor="@color/primary">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/textExpenseSummary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:lineSpacingExtra="2dp"/>
+        <View
+            android:id="@+id/viewCategoryColor"
+            android:layout_width="4dp"
+            android:layout_height="40dp"
+            android:background="@color/primary"
+            android:layout_marginEnd="16dp"/>
 
-        <!-- Optional: you can add a row for category and date below -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textExpenseSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grocery Shopping"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/on_surface"/>
 
             <TextView
                 android:id="@+id/textCategory"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textStyle="bold"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/textAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/on_surface"
-                android:textSize="12sp"/>
+                android:text="Food"
+                android:textSize="12sp"
+                android:alpha="0.6"/>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="R 250.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"/>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
