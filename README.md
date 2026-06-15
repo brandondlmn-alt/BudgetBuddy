@@ -28,19 +28,19 @@ Watch the full walkthrough of the application, including the transition from pro
 ### Authentication & Navigation
 | Login | Sign Up | Menu |
 | --- | --- | --- |
-| ![Login Placeholder](images/login.png) | ![Register Placeholder](images/register.png) | ![Menu Placeholder](images/menu.png) |
+| ![Login Placeholder](images/login.jpeg) | ![Register Placeholder](images/register.jpeg) | ![Menu Placeholder](images/menu.jpeg) |
 | *Secure Access* | *User Registration* | *Synchronized Side Navigation* |
 
 ### Core Analytics
 | Dashboard | Spending Analysis |
 | --- | --- |
-| ![Dashboard Placeholder](images/dashboard.png) | ![Reports Placeholder](images/reports.png) |
+| ![Dashboard Placeholder](images/dashboard.jpeg) | ![Reports Placeholder](images/reports.jpeg) |
 | *Dynamic Gauges & Alerts* | *Interactive Charts & Goal Tracking* |
 
 ### User Personalization & Gamification
 | Profile | Achievements |
 | --- | --- |
-| ![Profile Placeholder](images/profile.png) | ![Achievements Placeholder](images/achievements.png) |
+| ![Profile Placeholder](images/profile.jpeg) | ![Achievements Placeholder](images/achievements.jpeg) |
 | *Avatar & Detail Customization* | *Gamified Badges & Knowledge Rank* |
 
 ---
