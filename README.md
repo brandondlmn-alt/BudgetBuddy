@@ -34,13 +34,13 @@ Watch the full walkthrough of the application, including the transition from pro
 ### Core Analytics
 | Dashboard | Spending Analysis |
 | --- | --- |
-| ![Dashboard Placeholder](images/dashboard.jpeg) | ![Reports Placeholder](images/spending analysis.jpeg) |
+| ![Dashboard Placeholder](images/dashboard.jpeg) | ![Reports Placeholder](images/spending_analysis.jpeg) |
 | *Dynamic Gauges & Alerts* | *Interactive Charts & Goal Tracking* |
 
 ### User Personalization & Gamification
 | Profile | Achievements |
 | --- | --- |
-| ![Profile Placeholder](images/profile page.jpeg) | ![Achievements Placeholder](images/achievements.jpeg) |
+| ![Profile Placeholder](images/profile_page.jpeg) | ![Achievements Placeholder](images/achievements.jpeg) |
 | *Avatar & Detail Customization* | *Gamified Badges & Knowledge Rank* |
 
 ---
