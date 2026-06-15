@@ -19,7 +19,7 @@
 
 Watch the full walkthrough of the application, including the transition from prototype to the final polished build, showcasing all features and technical implementations:
 
-👉 **[Budget Buddy - Full App Walkthrough](https://youtu.be/W6mVr5_olYU)** *(Placeholder Link)*
+👉 **[Budget Buddy - Full App Walkthrough](https://youtu.be/W6mVr5_olYU)** 
 
 ---
 
