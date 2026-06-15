@@ -16,7 +16,7 @@ Budget Buddy is a premium personal finance application developed for the Roseban
 
 The following table explicitly compares the features of the initial prototype (before final development) to the enhanced, production-ready application.
 
-| Feature Area | Initial State (Before Prompting) | Final Developed App (After Prompting) |
+| Feature Area | Initial State  | Final Developed App  |
 | :--- | :--- | :--- |
 | **User Interface** | Basic XML layouts with default styling and minimal branding. | **Full Material 3 Overhaul**: Consistent card-based UI, outlined components, custom typography, and unified branding. |
 | **Navigation** | Standard button-driven flow with no central hub. | **Synchronized side Menu**: Implementation of a professional Hamburger Navigation Drawer for a modern, uncluttered experience. |
