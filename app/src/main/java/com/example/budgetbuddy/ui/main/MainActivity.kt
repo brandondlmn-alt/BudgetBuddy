@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Retrieve user session
         userId = intent.getIntExtra("USER_ID", -1)
         if (userId == -1) {
             finish()
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
 
+        // Hamburger icon listener
         toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
@@ -50,13 +52,14 @@ class MainActivity : AppCompatActivity() {
         setupDrawerHeader()
         setupNavigation()
 
+        // Load dashboard by default
         if (savedInstanceState == null) {
             loadFragment(DashboardFragment.newInstance(userId), "Dashboard")
             navView.setCheckedItem(R.id.nav_dashboard)
         }
     }
 
-    // Public method for fragments to trigger a header refresh
+    // Call this to update user info in the side menu from fragments
     fun refreshHeader() {
         runOnUiThread {
             setupDrawerHeader()
@@ -71,18 +74,15 @@ class MainActivity : AppCompatActivity() {
         val ivBadge = headerView.findViewById<ImageView>(R.id.iv_header_badge)
         val tvTier = headerView.findViewById<TextView>(R.id.tv_user_tier)
 
-        // Load Avatar from Preferences
         ivAvatar?.setImageResource(appPreferences.getAvatarResId())
 
-        // Load all User-specific data from the Database to ensure fresh data per account
         val db = DatabaseProvider.getDatabase(this)
         lifecycleScope.launch {
             val user = db.userDao().getUserById(userId)
 
-            // 1. Update Username
             tvUsername?.text = user?.username ?: "User"
 
-            // 2. Update Badge and Tier logic from Database score
+            // Show badge and tier title based on quiz results
             val score = user?.quizScore ?: -1
             if (score >= 0) {
                 ivBadge?.visibility = View.VISIBLE
@@ -105,7 +105,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                // Default state for new accounts
                 ivBadge?.visibility = View.GONE
                 tvTier?.text = "New Member"
             }
@@ -153,6 +152,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun logout() {
         val intent = Intent(this, LoginActivity::class.java)
+        // Clear stack to prevent back-button access after logout
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
@@ -166,6 +166,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateAvatarInDrawer(resId: Int) {
+        val headerView = navView.getHeaderView(0)
+        headerView.findViewById<ImageView>(R.id.iv_avatar).setImageResource(resId)
         setupDrawerHeader()
     }
 

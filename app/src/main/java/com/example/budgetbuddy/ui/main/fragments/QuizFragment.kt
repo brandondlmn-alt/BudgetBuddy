@@ -32,6 +32,7 @@ class QuizFragment : Fragment() {
         }
     }
 
+    // List of multiple-choice questions for the literacy quiz
     private val questions = listOf(
         Question(
             "What is a recommended percentage of income to save each month?",
@@ -78,6 +79,7 @@ class QuizFragment : Fragment() {
         
         displayQuestion()
 
+        // Highlight the selected answer to show user interaction
         binding.rgOptions.setOnCheckedChangeListener { group, checkedId ->
             for (i in 0 until group.childCount) {
                 val rb = group.getChildAt(i) as RadioButton
@@ -108,6 +110,7 @@ class QuizFragment : Fragment() {
                 else -> -1
             }
 
+            // Increment score if answer is correct
             if (selectedIndex == questions[currentQuestionIndex].correctAnswerIndex) {
                 score++
             }
@@ -125,13 +128,12 @@ class QuizFragment : Fragment() {
             val percentage = (score.toFloat() / questions.size * 100).toInt()
             val finalScore = if (percentage == 0) 0 else percentage
             
-            // Save score to Database instead of SharedPreferences to ensure data is fresh per user
+            // Persist the quiz score to the database and notify the main menu
             val db = DatabaseProvider.getDatabase(requireContext())
             lifecycleScope.launch {
                 val user = db.userDao().getUserById(userId)
                 if (user != null) {
                     db.userDao().updateUser(user.copy(quizScore = finalScore))
-                    // Explicitly notify the Activity to refresh its UI
                     (activity as? MainActivity)?.refreshHeader()
                 }
                 parentFragmentManager.popBackStack()
@@ -149,6 +151,7 @@ class QuizFragment : Fragment() {
         binding.rbOption4.text = question.options[3]
         binding.rgOptions.clearCheck()
         
+        // Reset option styles for the new question
         for (i in 0 until binding.rgOptions.childCount) {
             val rb = binding.rgOptions.getChildAt(i) as RadioButton
             rb.setBackgroundResource(R.drawable.category_icon_bg)

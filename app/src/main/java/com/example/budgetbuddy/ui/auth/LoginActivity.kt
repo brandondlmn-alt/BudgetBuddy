@@ -19,26 +19,31 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // setup preferences to optionally remember the username
         prefs = getSharedPreferences("budget_prefs", MODE_PRIVATE)
         binding.editUsername.setText(prefs.getString("username", ""))
 
         binding.btnLogin.setOnClickListener {
             val user = binding.editUsername.text.toString().trim()
             val pass = binding.editPassword.text.toString().trim()
+            
             if (user.isEmpty() || pass.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            
+            // verify credentials through the view model
             viewModel.login(user, pass) { userId ->
                 if (userId != null) {
                     if (binding.checkRemember.isChecked) {
                         prefs.edit().putString("username", user).apply()
                     }
+
                     val intent = Intent(this, MainActivity::class.java).apply {
                         putExtra("USER_ID", userId)
                     }
                     startActivity(intent)
-                    finish() // Close login only once
+                    finish()
                 } else {
                     Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
                 }

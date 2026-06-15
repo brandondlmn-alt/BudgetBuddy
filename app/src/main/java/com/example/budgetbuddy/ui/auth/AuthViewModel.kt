@@ -9,14 +9,19 @@ import com.example.budgetbuddy.data.entity.User
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
 
+/**
+ * Handles the logic for user authentication, including login, registration,
+ * and initial account setup.
+ */
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val db = (application as BudgetBuddyApplication).database
 
+    // Verifies user credentials and sets up default data if login is successful
     fun login(username: String, password: String, onResult: (Int?) -> Unit) {
         viewModelScope.launch {
             val user = db.userDao().getUserByUsername(username)
             if (user != null && user.passwordHash == hashPassword(password)) {
-                insertDefaultCategories(user.id)   // ensure defaults exist
+                insertDefaultCategories(user.id)
                 onResult(user.id)
             } else {
                 onResult(null)
@@ -24,6 +29,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Creates a new user account if the username isn't already taken
     fun register(username: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val existing = db.userDao().getUserByUsername(username)
@@ -38,6 +44,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Adds a standard set of categories for new users to start with
     private fun insertDefaultCategories(userId: Int) {
         viewModelScope.launch {
             val existing = db.categoryDao().getCategoriesByUser(userId)
@@ -56,6 +63,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Standard SHA-256 hashing for storing passwords securely
     private fun hashPassword(password: String): String {
         return MessageDigest.getInstance("SHA-256")
             .digest(password.toByteArray())

@@ -16,6 +16,8 @@ class PdfExporter(private val context: Context) {
 
     fun createPdf(expenses: List<Expense>): File? {
         val pdfDocument = PdfDocument()
+        
+        // Setting up paints for different text styles
         val titlePaint = Paint().apply {
             textSize = 20f
             isFakeBoldText = true
@@ -38,7 +40,7 @@ class PdfExporter(private val context: Context) {
         y += 40f
 
         for (expense in expenses) {
-            // Check if we need a new page (text + image buffer)
+            // Create a new page if the current one is getting full
             if (y > 700f) {
                 pdfDocument.finishPage(page)
                 pageNumber++
@@ -48,19 +50,20 @@ class PdfExporter(private val context: Context) {
                 y = 50f
             }
 
-            // Draw text details
+            // transaction details
             canvas.drawText("${expense.date} - ${expense.description}", 20f, y, textPaint)
             y += 20f
             canvas.drawText("Amount: R ${"%.2f".format(expense.amount)} | Time: ${expense.startTime} - ${expense.endTime}", 20f, y, subTextPaint)
             y += 25f
 
-            // Draw receipt image if it exists
+            // try to load and draw the receipt image if the path exists
             if (!expense.photoPath.isNullOrEmpty()) {
                 val file = File(expense.photoPath)
                 if (file.exists()) {
                     try {
                         val bitmap = BitmapFactory.decodeFile(file.absolutePath)
                         if (bitmap != null) {
+                            // scale the image to fit a 200x200 box
                             val maxWidth = 200f
                             val maxHeight = 200f
                             val ratio = Math.min(maxWidth / bitmap.width, maxHeight / bitmap.height)
@@ -70,18 +73,19 @@ class PdfExporter(private val context: Context) {
                             val destRect = Rect(20, y.toInt(), 20 + finalWidth, (y + finalHeight).toInt())
                             canvas.drawBitmap(bitmap, null, destRect, null)
                             y += finalHeight + 30f
-                            bitmap.recycle()
+                            bitmap.recycle() // cleanup memory
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
             }
-            y += 20f // Spacing between items
+            y += 20f
         }
 
         pdfDocument.finishPage(page)
 
+        // save to internal cache for sharing
         val file = File(context.cacheDir, "ExpenseReport_${System.currentTimeMillis()}.pdf")
         return try {
             pdfDocument.writeTo(FileOutputStream(file))

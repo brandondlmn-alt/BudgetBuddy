@@ -77,12 +77,11 @@ class AddExpenseFragment : Fragment() {
         userId = arguments?.getInt("USER_ID") ?: -1
         viewModel = ViewModelProvider(this)[AddExpenseViewModel::class.java]
 
-        // Restore state
-        savedInstanceState?.let {
-            currentPhotoPath = it.getString("photo_path")
-            selectedDate = it.getString("date", "")
-            selectedStartTime = it.getString("start_time", "00:00")
-            selectedEndTime = it.getString("end_time", "23:59")
+        if (savedInstanceState != null) {
+            currentPhotoPath = savedInstanceState.getString("photo_path")
+            selectedDate = savedInstanceState.getString("date", "")
+            selectedStartTime = savedInstanceState.getString("start_time", "00:00")
+            selectedEndTime = savedInstanceState.getString("end_time", "23:59")
         }
 
         updateDateTimeUI()
@@ -179,7 +178,7 @@ class AddExpenseFragment : Fragment() {
         val categoryIndex = binding.spinnerCategory.selectedItemPosition
         
         if (amount == null || amount <= 0 || selectedDate.isEmpty() || categoryIndex < 0) {
-            Snackbar.make(binding.root, "Please complete all fields (Amount, Date, Category)", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, "Please complete all fields", Snackbar.LENGTH_SHORT).show()
             return
         }
 
@@ -196,9 +195,9 @@ class AddExpenseFragment : Fragment() {
         )
         
         viewModel.addExpense(expense)
-        Snackbar.make(binding.root, "Expense Saved Successfully", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, "Transaction Saved!", Snackbar.LENGTH_SHORT).show()
         
-        // Reset form
+        // Clear fields for a new entry
         binding.etAmount.text?.clear()
         binding.etDescription.text?.clear()
         binding.ivReceiptThumbnail.visibility = View.GONE

@@ -1,59 +1,60 @@
-# 📂 Budget Buddy - Part 3: Final Developed Application
+# 📂 Budget Buddy - POE Part 3 Final Documentation
 
 **Project Name:** Budget Buddy  
-**Platform:** Android (API 24+)  
-**Language:** Kotlin  
-**Architecture:** MVVM (Model-View-ViewModel)  
-**Database:** Room SQLite  
-**UI Framework:** Material Design 3
+**Platform:** Android (Kotlin)  
+**Database:** Room SQLite (MVVM Architecture)  
+**Design System:** Material Design 3
 
 ---
 
 ## 🚀 1. Application Overview
-Budget Buddy is a premium personal finance ecosystem developed for the University POE. It transforms the concept of a "expense tracker" into an interactive, educational, and visually intelligent financial assistant. 
+Budget Buddy is a premium personal finance application developed for the Rosebank College POE. It empowers users to take control of their financial life through robust transaction tracking, high-quality visual analytics, and an integrated educational gamification system.
 
 ---
 
 ## 🔄 2. Feature Evolution: Prototype (Part 2) vs. Final App (Part 3)
 
-The following table highlights the technical and functional leap achieved during the final development phase.
+The following table explicitly compares the features of the initial prototype (before final development) to the enhanced, production-ready application.
 
-| Feature Area | Initial Prototype (Part 2) | Final Developed Application (Part 3) |
+| Feature Area | Initial State (Before Prompting) | Final Developed App (After Prompting) |
 | :--- | :--- | :--- |
-| **User Interface** | Basic XML with default styling and limited layout consistency. | **Material 3 Overhaul**: Consistent card-based UI, outlined components, custom typography, and branded favicon. |
-| **Navigation** | Standard button-driven flow. | **Synchronized Side Menu**: Professional Hamburger Navigation Drawer for an uncluttered and spacious experience. |
-| **Dashboard** | Static text summary of totals and goals. | **Interactive Visual Analytics**: Custom Canvas-built "Spent" (Filling) and "Remaining" (Depleting) gauges with dynamic Red/Green alerts and "Money is finished" status text. |
-| **Expense Logging**| Basic Date and Amount entry. | **Precision Data Capture**: Integrated Date & Time pickers, robust category mapping, and automatic background state restoration. |
-| **Receipt System** | Basic capture (unstable). | **Stable Media Handling**: Robust `FileProvider` logic with memory-optimized image downsampling and full-screen previews in history. |
-| **Reporting** | simple text-based list view. | **Visual PDF Export**: Professional documents with **embedded receipt images** for every transaction and automated pagination. |
-| **Profile** | Single static user profile view. | **Full Customization**: Ability to set First Name, Last Name, Age, and choose from 5 unique avatars. |
-| **Gamification** | None. | **Knowledge Rank System**: 5-Tier Badge Engine (Bronze to Diamond) + side-menu "Knowledge Badge" based on quiz performance. |
-| **Education** | None. | **Financial Literacy Quiz**: Interactive 5-question test with answer highlighting and persistent rank tracking in RoomDB. |
-| **Account Security**| No session management. | **Session Control**: Full **Logout** functionality with task-stack clearing for secure multi-user testing. |
+| **User Interface** | Basic XML layouts with default styling and minimal branding. | **Full Material 3 Overhaul**: Consistent card-based UI, outlined components, custom typography, and unified branding. |
+| **Navigation** | Standard button-driven flow with no central hub. | **Synchronized side Menu**: Implementation of a professional Hamburger Navigation Drawer for a modern, uncluttered experience. |
+| **Dashboard** | Static text summary showing only numerical totals. | **Visual Analytics**: Custom Canvas-built "Spent" (Filling) and "Remaining" (Depleting) gauges with dynamic Red/Green alerts and "Money is finished" logic. |
+| **Spending Analysis**| Static text list of category totals. | **Visual Analytics Engine**: Interactive Pie Chart breakdown with live reference to Monthly Goal boundaries (Min/Max). |
+| **Data Logging** | Basic fields for amount and date entry. | **Precision Tracking**: Integrated Date & Time pickers with robust category mapping and background state restoration. |
+| **Receipt System** | Basic image capture (prone to crashes and data loss). | **Stable Media Handling**: Secure `FileProvider` implementation with memory-optimized image downsampling and full-screen previews. |
+| **Reporting** | simple text-based transaction list. | **Visual PDF Export**: Generates professional documents that embed actual **receipt images** for every transaction with automated pagination. |
+| **Gamification** | Non-existent. | **Achievement Engine**: 5-Tier Badge system (Bronze to Diamond) + Side-menu Knowledge Rank based on quiz performance. |
+| **Educational Tool** | None. | **Financial Literacy Quiz**: Interactive test with answer highlighting and persistent rank tracking stored securely in RoomDB. |
+| **Profile** | Static view with only the username. | **Full Customization**: User can edit Name, Surname, Age, and choose from 5 unique avatars that sync instantly with the app header. |
+| **Security** | Permanent login with no way to exit. | **Session Management**: Dedicated **Logout** functionality with task-stack clearing for secure multi-user testing. |
+| **Branding** | Default Android application icon. | **Complete Brand Integration**: Custom branded Launcher Icon and app bar "favicon" using the official `app_logo.png`. |
 
 ---
 
-## 🎯 3. Rubric Fulfillment (Technical Mapping)
+## 🎯 3. Rubric Fulfillment (Technical Details)
 
 | Rubric Criterion | Implementation Status | Technical Implementation Details |
 | :--- | :--- | :--- |
-| **1. Real Phone Support** | ✅ **Complete** | Optimized for physical hardware with secure `FileProvider` camera intents and high-res image management. |
-| **2. Flawless Data Capture** | ✅ **Complete** | Implemented ViewBinding and strict input validation. Process death resilience added to ensure no data loss during photo capture. |
-| **3. Original Features** | ✅ **Complete** | **Feature 1:** PDF Export with embedded images. **Feature 2:** Financial Literacy Quiz with dynamic profile rank badges. |
-| **4. Graphs (Spending/Goals)** | ✅ **Complete** | Custom `PieChartView` showing distribution vs. live Monthly Goal boundary markers. |
-| **5. Progress Dashboard** | ✅ **Complete** | Dual-gauge visualizers with real-time color-coded alerts (Green = Safe, Red = Over Budget). |
-| **6. Gamification** | ✅ **Complete** | 5-Tier Achievement system and a Quiz-based Knowledge Rank Badge permanently displayed on the Profile and Side Menu. |
-| **7. Excellent UI** | ✅ **Complete** | Unified Material 3 design, custom "BudgetBuddy Green" palette, and synchronized branding across icons and toolbars. |
+| **1. Real Phone Support** | ✅ **Complete** | Optimized for physical hardware with secure camera intents and high-res image management. |
+| **2. Flawless Data Capture** | ✅ **Complete** | Implemented ViewBinding and strict input validation for amounts, dates, and times. |
+| **3. Original Features** | ✅ **Complete** | **Feature 1:** PDF Export with embedded images. **Feature 2:** Financial Literacy Quiz & Knowledge Badges. |
+| **4. Graphs (Spending/Goals)** | ✅ **Complete** | Custom `PieChartView` in Reports showing distribution vs. Monthly Goal boundaries. |
+| **5. Progress Dashboard** | ✅ **Complete** | Dual-gauge visualizers with real-time status text alerts (e.g., "Money is finished"). |
+| **6. Gamification** | ✅ **Complete** | 5-Tier Achievement system and a Quiz-based Knowledge Rank Badge on the Profile and Side Menu. |
+| **7. Excellent UI** | ✅ **Complete** | Unified Material 3 design, custom typography, and synchronized navigation menus. |
 | **8. Professional Demo** | ⏳ **User Task** | Functional for a walkthrough showing the transition from Prototype to Final App. |
 
 ---
 
-## 🛠 4. Technical Robustness & Fixes
+## 🛠 4. Key Technical Robustness Fixes
 
-*   **Memory Management**: Implemented `inSampleSize` logic in `BitmapFactory` to prevent `OutOfMemory` crashes on high-res receipt images.
-*   **Database Reliability**: Solved recursive initialization loops by using raw SQL seeding in the `onOpen` callback. Incremented to version 32 to support extended user metadata.
-*   **State Persistence**: Utilized `onSaveInstanceState` so that user selections (times, dates, photo paths) survive when Android kills the app for memory during camera usage.
-*   **ViewBinding**: Enforced 100% Type-Safe view access to eliminate `NullPointerExceptions` across the entire navigation flow.
+*   **Memory Management**: Implemented `inSampleSize` logic to handle high-resolution photos without `OutOfMemory` crashes.
+*   **State Persistence**: Utilized `onSaveInstanceState` across fragments to ensure selections (times, dates, photo paths) survive process death.
+*   **Database Reliability**: Resolved recursive Room initialization crashes by using safe raw SQL seeding in the `onOpen` callback.
+*   **ViewBinding**: Enforced type-safe view access across 100% of fragments to eliminate `NullPointerExceptions`.
+*   **Data Integrity**: Migrated achievement data from SharedPreferences to RoomDB to ensure scores are unique to each user account.
 
 ---
 
@@ -61,7 +62,7 @@ The following table highlights the technical and functional leap achieved during
 1.  **Release APK**: Found in `app/build/outputs/apk/debug/app-debug.apk`.
 2.  **GitHub Repository Link**: Ensure your repo is public and current.
 3.  **CI/CD Badge**: Verify that the GitHub Actions build workflow is successful.
-4.  **Demo Video**: 3-5 minute walkthrough focused on the **New Features** implemented in Part 3.
+4.  **Demo Video**: 3-5 minute walkthrough focused on the **Evolution** from Part 2 to Part 3.
 
 ---
-**Developed for University POE - Part 3**
+**Developed for Rosebank College POE - Part 3**
