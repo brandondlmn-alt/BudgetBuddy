@@ -1,6 +1,5 @@
 # 📂 Budget Buddy - POE Part 3 Final Documentation
-
-**Author:** Brandon Dlamini  
+ 
 **Institution:** IIE Rosebank College Braamfontein (Diploma in IT Software Development)  
 **Platform:** Android (Kotlin)  
 **Database:** Room SQLite (MVVM Architecture)  
